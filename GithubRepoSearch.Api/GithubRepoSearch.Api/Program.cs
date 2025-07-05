@@ -1,9 +1,21 @@
-using System.Text;
+﻿using System.Text;
 using GithubRepoSearch.Api.Services;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 
 var builder = WebApplication.CreateBuilder(args);
+// Add CORS policy
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAngularClient", policy =>
+    {
+        policy
+            .WithOrigins("http://localhost:4200") // 👈 your Angular dev server
+            .AllowAnyHeader()
+            .AllowAnyMethod()
+            .AllowCredentials(); // Optional if using cookies or auth headers
+    });
+});
 
 // Add services to the container.
 
@@ -36,6 +48,7 @@ builder.Services.AddAuthentication(options =>
 builder.Services.AddAuthorization();
 
 var app = builder.Build();
+app.UseCors("AllowAngularClient");
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
