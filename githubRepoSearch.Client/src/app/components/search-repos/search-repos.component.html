@@ -1,4 +1,5 @@
 <div class="search-container">
+
     <mat-form-field class="full-width" appearance="fill">
       <mat-label>Search GitHub Repositories</mat-label>
       <input matInput [(ngModel)]="query" (keyup.enter)="searchRepos()" />
@@ -6,23 +7,32 @@
   
     <button mat-raised-button color="primary" (click)="searchRepos()">Search</button>
   
-    <div class="results">
-      @for (repo of pagedResults; track repo.name) {
-        <app-repo-card
-          [name]="repo.name"
-          [avatarUrl]="repo.ownerAvatarUrl"
-          [description]="repo.description"
-          (bookmark)="bookmarkRepo(repo)">
-        </app-repo-card>
-      }
+    <div class="spinner-container" *ngIf="loading">
+      <mat-spinner></mat-spinner>
     </div>
-  
-    <mat-paginator
-      [length]="results.length"
-      [pageSize]="pageSize"
-      [pageIndex]="pageIndex"
-      [pageSizeOptions]="[5, 10, 20]"
-      (page)="onPageChange($event)">
-    </mat-paginator>
+
+    @if(!loading) {
+      <div class="results">
+        @for (repo of pagedResults; track repo.ownerAvatarUrl) {
+          <app-repo-card
+            [name]="repo.name"
+            [avatarUrl]="repo.ownerAvatarUrl"
+            [description]="repo.description"
+            [htmlUrl]="repo.htmlUrl"
+            (bookmark)="bookmarkRepo(repo)">
+          </app-repo-card>
+        }
+      </div>
+    }
+    
+    @if(pagedResults.length !== 0 && !loading) {
+      <mat-paginator
+        [length]="results.length"
+        [pageSize]="pageSize"
+        [pageIndex]="pageIndex"
+        [pageSizeOptions]="[5, 10, 20]"
+        (page)="onPageChange($event)">
+      </mat-paginator>
+    } 
   </div>
   

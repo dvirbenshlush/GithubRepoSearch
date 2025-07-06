@@ -1,7 +1,6 @@
 import { Observable } from 'rxjs';
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { LoginRequest, LoginResponse } from '../models/user.model';
 
 @Injectable({ providedIn: 'root' })
 export class RepoService {
