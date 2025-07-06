@@ -1,8 +1,10 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using GithubRepoSearch.Api.Services;
+using Microsoft.AspNetCore.Authorization;
 
 namespace GithubRepoSearch.Api.Controllers;
 
+[Authorize]
 [ApiController]
 [Route("api/[controller]")]
 public class GitHubController : ControllerBase
