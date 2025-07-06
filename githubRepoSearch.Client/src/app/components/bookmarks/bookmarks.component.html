@@ -1,0 +1,13 @@
+<div class="bookmarks-container">
+    <h2>Bookmarked Repositories</h2>
+    <div class="results">
+      @for (repo of bookmarks; track repo.name) {
+        <app-repo-card
+          [name]="repo.name"
+          [avatarUrl]="repo.htmlUrl"
+          [description]="repo.description"
+          (bookmark)="removeBookmark(repo.name)">
+        </app-repo-card>
+      }
+    </div>
+  </div>

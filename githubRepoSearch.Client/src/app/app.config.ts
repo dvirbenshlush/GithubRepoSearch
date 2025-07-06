@@ -1,22 +1,21 @@
 import { routes } from './app.routes';
 import { provideRouter } from '@angular/router';
-import { JwtInterceptor } from './interseptors/jwt.interceptor';
+import { jwtInterceptor } from './interceptors/jwt.interceptor';
 import { provideClientHydration } from '@angular/platform-browser';
+import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { ApplicationConfig, provideZoneChangeDetection } from '@angular/core';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
-import { HTTP_INTERCEPTORS, provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 
 export const appConfig: ApplicationConfig = {
   providers: [
-    provideZoneChangeDetection({ eventCoalescing: true }), 
-    provideRouter(routes), 
-    provideHttpClient(withInterceptorsFromDi()),
-    {
-      provide: HTTP_INTERCEPTORS,
-      useClass: JwtInterceptor,
-      multi: true
-    },
-    provideClientHydration(), 
+    provideHttpClient(
+      withInterceptors([
+        jwtInterceptor // ✅ No need to use `HTTP_INTERCEPTORS` anymore!
+      ])
+    ),
+    provideZoneChangeDetection({ eventCoalescing: true }),
+    provideRouter(routes),
+    provideClientHydration(),
     provideAnimationsAsync()
   ]
 };

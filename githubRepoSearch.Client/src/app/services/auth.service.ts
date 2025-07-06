@@ -14,11 +14,11 @@ export class AuthService {
   }
 
   setToken(token: string): void {
-    localStorage.setItem('token', token);
+    localStorage.setItem('jwtToken', token);
   }
 
   getToken(): string | null {
-    return localStorage.getItem('token');
+    return localStorage.getItem('jwtToken');
   }
 
   isLoggedIn(): boolean {
@@ -26,6 +26,6 @@ export class AuthService {
   }
 
   logout(): void {
-    localStorage.removeItem('token');
+    localStorage.removeItem('jwtToken');
   }
 }

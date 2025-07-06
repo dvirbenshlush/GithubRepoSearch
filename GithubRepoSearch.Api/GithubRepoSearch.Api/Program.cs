@@ -1,32 +1,42 @@
 ﻿using System.Text;
 using GithubRepoSearch.Api.Services;
-using Microsoft.IdentityModel.Tokens;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
 
 var builder = WebApplication.CreateBuilder(args);
-// Add CORS policy
+
+// CORS: Allow Angular dev client
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAngularClient", policy =>
     {
-        policy
-            .WithOrigins("http://localhost:4200") // 👈 your Angular dev server
-            .AllowAnyHeader()
-            .AllowAnyMethod()
-            .AllowCredentials(); // Optional if using cookies or auth headers
+        policy.WithOrigins("http://localhost:4200")
+              .AllowAnyHeader()
+              .AllowAnyMethod()
+              .AllowCredentials(); // Optional if using cookies or authorization headers
     });
 });
 
-// Add services to the container.
-
+// Controllers
 builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+
+// Swagger
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+// DI Services
 builder.Services.AddHttpClient<IGitHubService, GitHubService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 
-// JWT setup
+builder.Services.AddDistributedMemoryCache(); 
+builder.Services.AddSession(options =>
+{
+    options.IdleTimeout = TimeSpan.FromMinutes(30);
+    options.Cookie.HttpOnly = true;
+    options.Cookie.IsEssential = true;
+});
+
+// JWT Setup
 var jwtSecret = builder.Configuration["Jwt:Secret"];
 builder.Services.AddAuthentication(options =>
 {
@@ -41,16 +51,18 @@ builder.Services.AddAuthentication(options =>
         ValidateAudience = false,
         ValidateLifetime = true,
         ValidateIssuerSigningKey = true,
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(jwtSecret))
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(jwtSecret!))
     };
 });
 
 builder.Services.AddAuthorization();
 
+// Build the app
 var app = builder.Build();
+
+// Enable middleware
 app.UseCors("AllowAngularClient");
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -58,9 +70,10 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
+app.UseRouting();
+app.UseAuthentication();
 app.UseAuthorization();
-
+app.UseSession(); 
 app.MapControllers();
 
 app.Run();
